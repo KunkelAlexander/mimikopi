@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fretnotes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <input id="title" maxlength="60" spellcheck="false" aria-label="Song title" value="Untitled song">
+      <p>Guitar transcription without typing. Click the fretboard, move with the arrow keys.</p>
+    </div>
+    <nav class="pills">
+      <button class="pill primary" data-act="play" id="btnPlay">&#9654; Play</button>
+      <button class="pill" data-act="undo" id="btnUndo">Undo</button>
+      <button class="pill" data-act="redo" id="btnRedo">Redo</button>
+      <button class="pill" data-act="export">Export</button>
+      <button class="pill" data-act="import">Import</button>
+      <button class="pill" data-act="new">New</button>
+    </nav>
+    <div class="status"><span class="sdot" id="sdot"></span><span id="saved">Saved</span></div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="card-head">
+        <h2>Tab</h2>
+        <div class="tools">
+          <label class="tl">Key
+            <select id="keyRoot" class="pill">
+              <option value="0">C</option><option value="1">C&sharp; / D&flat;</option><option value="2">D</option>
+              <option value="3">E&flat; / D&sharp;</option><option value="4">E</option><option value="5">F</option>
+              <option value="6">F&sharp; / G&flat;</option><option value="7">G</option><option value="8">A&flat; / G&sharp;</option>
+              <option value="9">A</option><option value="10">B&flat; / A&sharp;</option><option value="11">B</option>
+            </select>
+            <select id="keyMode" class="pill"><option value="major">major</option><option value="minor">minor</option></select>
+          </label>
+          <label class="tl">Tuning <select id="tuning" class="pill"></select></label>
+          <label class="tl" title="One step = one eighth note">Tempo <input id="tempo" type="range" min="40" max="240" step="1"><b id="tempoVal">90</b></label>
+          <button class="pill sm" data-toggle="labels">Function labels</button>
+        </div>
+      </div>
+      <div id="tab" class="tab-scroll" tabindex="-1"></div>
+      <p class="hint">
+        <kbd>&larr;</kbd><kbd>&rarr;</kbd> step &nbsp; <kbd>&uarr;</kbd><kbd>&darr;</kbd> string &nbsp; <kbd>0</kbd>-<kbd>9</kbd> fret (type <kbd>1</kbd><kbd>2</kbd> for 12)
+        &nbsp; <kbd>Del</kbd> clear &nbsp; <kbd>Enter</kbd> new step &nbsp; <kbd>B</kbd> bar line &nbsp; <kbd>H</kbd><kbd>P</kbd><kbd>S</kbd> hammer / pull / slide
+        &nbsp; <kbd>Shift</kbd>+arrows select &nbsp; <kbd>Ctrl</kbd>+<kbd>C</kbd>/<kbd>X</kbd>/<kbd>V</kbd>/<kbd>D</kbd> copy, cut, paste, duplicate
+        &nbsp; <kbd>Space</kbd> play
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Fretboard</h2>
+        <div class="tools">
+          <label class="tl">Scale
+            <select id="scale" class="pill">
+              <option value="off">Off</option><option value="key">Key scale</option>
+              <option value="pent">Pentatonic</option><option value="blues">Blues</option>
+            </select>
+          </label>
+          <button class="pill sm" data-toggle="shape" title="Shows a common shape for the chord. Click a dashed dot to enter the whole chord.">Chord shape</button>
+          <button class="pill sm" data-toggle="advance" title="Move to the next step after each click. Hold Shift while clicking to stack notes into a chord.">Auto-advance</button>
+        </div>
+      </div>
+      <div class="fb-wrap" id="fretboard"></div>
+      <p class="hint">Click to place a note. Hold <kbd>Shift</kbd> to add notes to the same step (a chord). Blue = root, green = chord tone, grey = scale tone, dashed = chord shape.</p>
+    </section>
+
+    <div class="row3">
+      <section class="card">
+        <div class="card-head"><h2>Chord</h2><button class="pill sm" data-act="chord-clear" id="chordClear">Clear</button></div>
+        <p class="info" id="chordInfo"></p>
+        <div class="group"><div class="lbl">In this key</div><div class="btns" id="dia"></div></div>
+        <div class="group"><div class="lbl">Root</div><div class="btns" id="roots"></div></div>
+        <div class="group"><div class="lbl">Quality</div><div class="btns" id="quals"></div></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Note</h2><button class="pill sm" data-act="clear-step">Clear step</button></div>
+        <p class="info" id="noteInfo"></p>
+        <div class="group"><div class="lbl">Role</div>
+          <div class="btns">
+            <button class="pill sm" data-tag="pass">passing</button>
+            <button class="pill sm" data-tag="appr">approach</button>
+            <button class="pill sm" data-tag="blue">blue note</button>
+            <button class="pill sm" data-tag="ghost">ghost</button>
+          </div>
+        </div>
+        <div class="group"><div class="lbl">Technique (into the next note)</div>
+          <div class="btns">
+            <button class="pill sm" data-link="h">hammer-on</button>
+            <button class="pill sm" data-link="p">pull-off</button>
+            <button class="pill sm" data-link="s">slide</button>
+          </div>
+        </div>
+        <div class="group"><div class="lbl">Step</div>
+          <div class="btns"><button class="pill sm" data-act="bar" id="barBtn">Bar line</button></div>
+        </div>
+        <details class="group"><summary>Optional text note</summary>
+          <textarea id="stepText" rows="2" placeholder="Anything the buttons can't say"></textarea>
+        </details>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2>Sections</h2><span class="muted" id="secInfo"></span></div>
+        <div class="group"><div class="lbl">Label from the cursor (or the selection)</div>
+          <div class="btns" id="presets"></div>
+        </div>
+        <div class="group"><div class="btns">
+          <button class="pill sm" data-act="sec-times" id="secTimes">Repeat &times;2</button>
+          <button class="pill sm" data-act="sec-rename" id="secRename">Rename</button>
+          <button class="pill sm" data-act="sec-remove" id="secRemove">Remove label</button>
+        </div></div>
+        <div class="group"><div class="lbl">Selection</div>
+          <div class="btns">
+            <button class="pill sm" data-act="copy">Copy</button>
+            <button class="pill sm" data-act="cut">Cut</button>
+            <button class="pill sm" data-act="paste">Paste</button>
+            <button class="pill sm" data-act="dup">Duplicate</button>
+            <button class="pill sm" data-act="del">Delete</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <input type="file" id="file" accept="application/json,.json" hidden>
+  <div id="toast" role="status"></div>
+
+  <script src="js/theory.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/tab.js"></script>
+  <script src="js/fretboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
