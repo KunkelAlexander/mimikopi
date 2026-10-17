@@ -1,5 +1,7 @@
 # Mimikopi
 
+![](image.png)
+
 A no-typing guitar transcription tool built by Claude Code. 
 This is for my personal use because I wanted an easy-to-use software. 
 Plain HTML/CSS/JS, no build step.
